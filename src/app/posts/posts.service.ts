@@ -1,13 +1,24 @@
 import { Subject } from 'rxjs';
 import {Post} from './post.model';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-
+@Injectable({providedIn: 'root'})
 export class PostsService {
     private posts: Post[] = [];
     private postsUpdated = new Subject<Post[]>();
 
+    constructor(private http: HttpClient) {}
+
     getPosts() {
-        return [...this.posts];
+        // we need to listen to this get request as we do expect a response, so we use subscribe
+        // we dont need to store this and unsubscribe in features built in angular like http client, it is handled automatically
+        // .get method extracts and format the data to JS from json
+        this.http.get<{message: string, posts: Post[]}>('http://localhost:3000/posts')
+            .subscribe((postData) => {
+                this.posts = postData.posts;
+                this.postsUpdated.next([...this.posts]);
+            });
     }
 
     getPostUpdateListener() {
