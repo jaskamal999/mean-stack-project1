@@ -27,7 +27,12 @@ export class PostsService {
 
     addPost(post: Post) {
         // const myPost: Post = {title: post.title, content: post.content};
-        this.posts.push(post);
-        this.postsUpdated.next([...this.posts]);
+        // the post in second argument below is the post we want to add, not anything related to post request 
+        this.http.post<{message: string}>('http://localhost:3000/posts', post)
+            .subscribe((responseData) => {
+                console.log(responseData.message);
+                this.posts.push(post);
+                this.postsUpdated.next([...this.posts]);
+            });
     } 
 }
